@@ -15,17 +15,20 @@ def epoch_update(epoch_num, model_name, metrics, first_epoch=None):
     client = Client(account_sid, auth_token)
 
     msg_body = '===== Epoch [{}] Complete ===== \n'.format(epoch_num)
-    msg_body = msg_body.join('Model Name: {}\n\n'.format(model_name))
-    msg_body = msg_body.join('Metrics:\n')
-    for metric, metric_val in metrics:
-        msg_body = msg_body.join('  {} ---- {}\n'.format(metric, float(metric_val)))
-
+    msg_body = '{} First Epoch [{}]\n'.format(msg_body, first_epoch)
+    msg_body = '{} Model Name: {}\n\n'.format(msg_body, model_name)
+    msg_body = '{} Metrics:\n'.format(msg_body)
+    for metric in metrics:
+        msg_body = '{}  {} ---- {}\n'.format(msg_body, metric, float(metrics[metric]))
+     
     message = client.messages \
                     .create(
                          body=msg_body,
                          from_=account_number,
                          to=dest_number
                      )
-    
-print(message.sid)
 
+metric_dict = {}
+metric_dict["loss"] = 1.2345
+metric_dict["less2"] = 2.352
+epoch_update(3, "new model", metric_dict, first_epoch=1)
