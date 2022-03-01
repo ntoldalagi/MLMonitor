@@ -4,23 +4,28 @@ from twilio.rest import Client
 
 cfg_file = open('ml_monitor.json', 'r')
 cfg_dict = json.load(cfg_file)
+cfg_file.close()
 
-# Find your Account SID and Auth Token at twilio.com/console
-# and set the environment variables. See http://twil.io/secure
 account_sid = cfg_dict['account_side']
 auth_token =  cfg_dict['account_token']
 account_number = cfg_dict['account_number']
 dest_number = cfg_dict['dest_number'] 
 
-client = Client(account_sid, auth_token)
+def epoch_update(epoch_num, model_name, metrics, first_epoch=None):
+    client = Client(account_sid, auth_token)
 
-message = client.messages \
-                .create(
-                     body="Join Earth's mightiest heroes. Like Kevin Bacon.",
-                     from_=account_number,
-                     to=dest_number
-                 )
+    msg_body = '===== Epoch [{}] Complete ===== \n'.format(epoch_num)
+    msg_body = msg_body.join('Model Name: {}\n\n'.format(model_name))
+    msg_body = msg_body.join('Metrics:\n')
+    for metric, metric_val in metrics:
+        msg_body = msg_body.join('  {} ---- {}\n'.format(metric, float(metric_val)))
 
+    message = client.messages \
+                    .create(
+                         body=msg_body,
+                         from_=account_number,
+                         to=dest_number
+                     )
+    
 print(message.sid)
 
-cfg_file.close()
